@@ -6,7 +6,7 @@
 
     <groupId>com.moe.myfamilybudget</groupId>
     <artifactId>domain-wealth</artifactId>
-    <version>0.0.1</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>domain-wealth</name>
     <description>Silo Patrimoine MyFamilyBudget (API et Core) - Dépôt autonome</description>
@@ -17,6 +17,16 @@
     </modules>
 
     <properties>
+        <!--
+            REL-010 (back/server/doc/architecture/27-backlog-automatisation-release.md) : version unique du
+            dépôt (CI Friendly Versions). `revision` est la seule valeur à modifier pour faire évoluer la
+            version de ce dépôt et de ses deux modules (wealth-api, wealth-core) ; le pom racine et les pom
+            enfants référencent `${revision}` plutôt qu'un littéral. flatten-maven-plugin (ci-dessous, dans
+            <build>/<plugins>) résout `${revision}` dans le pom publié (GitHub Packages) sans jamais modifier
+            le pom.xml source (flattenMode=resolveCiFriendliesOnly, updatePomFile=false).
+        -->
+        <revision>0.0.2-SNAPSHOT</revision>
+
         <java.version>21</java.version>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,6 +40,7 @@
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
         <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
         <japicmp-maven-plugin.version>0.23.1</japicmp-maven-plugin.version>
+        <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
     </properties>
 
     <repositories>
@@ -100,6 +111,37 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <!-- REL-010 : résout `${revision}` dans le pom publié sur GitHub Packages, sans toucher au pom.xml
+             source (updatePomFile=false). Déclaré ici (plugins actifs, pas pluginManagement) pour être
+             hérité et exécuté automatiquement par wealth-api et wealth-core. -->
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven-plugin.version}</version>
+                <configuration>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                    <updatePomFile>false</updatePomFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <distributionManagement>
