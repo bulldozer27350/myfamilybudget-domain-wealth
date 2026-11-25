@@ -28,4 +28,43 @@
     <name>wealth-api</name>
     <description>API du silo Patrimoine MyFamilyBudget (contrats, ports, interfaces de service ; sans Spring ni JPA)</description>
 
+
+    <build>
+        <plugins>
+            <!--
+                REL-030 : japicmp compare l'API binaire de ce module a sa derniere version publiee
+                (oldVersion=RELEASE). ignoreMissingOldVersion=true : ne fait pas echouer le build s'il n'y a
+                encore aucune version publiee (silo tout juste cree). breakBuildOnBinaryIncompatibleModifications
+                reste a true (herite de <pluginManagement> dans le pom racine) : un changement binaire non
+                retrocompatible fait echouer `mvn verify`/`mvn clean verify`. Rapport : target/japicmp/japicmp.diff
+                (et .xml) apres `mvn verify`.
+            -->
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <configuration>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>com.moe.myfamilybudget</groupId>
+                            <artifactId>wealth-api</artifactId>
+                            <version>RELEASE</version>
+                        </dependency>
+                    </oldVersion>
+                    <parameter>
+                        <ignoreMissingOldVersion>true</ignoreMissingOldVersion>
+                    </parameter>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>japicmp</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>cmp</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

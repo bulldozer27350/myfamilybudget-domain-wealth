@@ -49,6 +49,19 @@
             <name>GitHub Packages MyFamilyBudget (BOM)</name>
             <url>https://maven.pkg.github.com/bulldozer27350/MyFamilyBudget</url>
         </repository>
+        <!--
+            REL-030 (back/server/doc/architecture/27-backlog-automatisation-release.md) : depot de lecture
+            necessaire a japicmp-maven-plugin (wealth-api/pom.xml, wealth-core/pom.xml) pour resoudre la derniere
+            version publiee (oldVersion=RELEASE) de ce depot et comparer l'API binaire. Meme id ("github") que
+            <distributionManagement> ci-dessous : le serveur deja declare dans settings.xml (CI) s'applique
+            donc automatiquement en lecture aussi. Pour un build local (hors CI), ce depot necessite un
+            <server> "github" dans son propre ~/.m2/settings.xml avec un token personnel (scope read:packages).
+        -->
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages Patrimoine (lecture, REL-030)</name>
+            <url>https://maven.pkg.github.com/bulldozer27350/myfamilybudget-domain-wealth</url>
+        </repository>
     </repositories>
 
     <dependencyManagement>
