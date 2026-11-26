@@ -136,6 +136,8 @@ jobs:
     steps:
       - name: Checkout des sources
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configuration de Java 21
         uses: actions/setup-java@v4
@@ -198,3 +200,24 @@ jobs:
         with:
           body_path: ${{ runner.temp }}/release-notes-body.md
           generate_release_notes: false
+
+      - name: Generation du CHANGELOG.md (git-cliff, REL-040)
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --output /tmp/CHANGELOG.md
+
+      - name: Publication du CHANGELOG.md sur main (REL-040)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main --quiet
+          git checkout -B main origin/main
+          cp /tmp/CHANGELOG.md CHANGELOG.md
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "CHANGELOG.md inchange, rien a publier."
+            exit 0
+          fi
+          git add CHANGELOG.md
+          git commit -m "docs: met a jour CHANGELOG.md (${GITHUB_REF_NAME}) [skip ci]"
+          git push origin main
