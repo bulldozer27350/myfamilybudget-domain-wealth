@@ -77,6 +77,8 @@
                     </oldVersion>
                     <parameter>
                         <ignoreMissingOldVersion>true</ignoreMissingOldVersion>
+                        <!-- REL-050 : le rapport XML est necessaire a scripts/suggest-version-bump.py -->
+                        <skipXmlReport>false</skipXmlReport>
                     </parameter>
                 </configuration>
                 <executions>
